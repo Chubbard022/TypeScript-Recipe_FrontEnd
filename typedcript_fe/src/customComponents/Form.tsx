@@ -8,7 +8,7 @@ interface TodoInterface{
     completed: boolean;
 }
 interface TodoListInterface{
-    [index:string]: TodoInterface
+    [index:number]: TodoInterface
 }
 interface HanleChangeInterface{
     (event:React.ChangeEvent<HTMLInputElement>): void;
@@ -17,7 +17,7 @@ interface HandleSubmit{
     ():void
 }
 interface HandleTodoClick {
-    (item :string): void;
+    (item :TodoInterface, index:number): void;
 }
 //----------------------------------------------------------------------
 export const Form:React.FC = () =>{
@@ -25,22 +25,26 @@ export const Form:React.FC = () =>{
         name:"",
         completed: false
     });
-    const [todoList,setTodoList] = useState<TodoListInterface[]>([]);
+    const [todoList,setTodoList] = useState<Array<TodoInterface>>([]);
 
     const handleInput:HanleChangeInterface = (event) =>{
-        console.log(event.currentTarget.value)
         setTodo({name:event.currentTarget.value,completed:false})
         
     }
 
-    const handleButtonSubmit:HandleSubmit = () =>{
-       // setTodoList([...todoList,todo])
+    const handleButtonSubmit = () =>{
+         setTodoList([...todoList,todo])
          setTodo({name:"",completed:false})
+         console.log(todoList)
     }
-    const handleTodoItem:HandleTodoClick = (item) =>{
-        console.log(item)
-    }
+    const handleTodoItem:HandleTodoClick = (item,index) =>{
+        console.log(item,index)
 
+        let updatedTodoList = [...todoList];
+        updatedTodoList[index] = {name:item.name,completed:!item.completed}
+        setTodoList(updatedTodoList)
+    }
+    
     return(
         <div>
             <input
@@ -56,7 +60,7 @@ export const Form:React.FC = () =>{
             {todoList.length? <div>
                 {todoList.map((item,index)=>{
                     return(
-                        <p key={index}>{item}</p>
+                        <p key={index} style={item.completed? {color:"red"}:{color:"black"}}onClick={()=>handleTodoItem(item,index)}>{item.name}</p>
                     )
                 })}
             </div>: null}
