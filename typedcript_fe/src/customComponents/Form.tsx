@@ -6,15 +6,10 @@ import {useState,useReducer} from "react"
 interface TodoInterface{
     name: string;
     completed: boolean;
-}
-interface TodoListInterface{
-    [index:number]: TodoInterface
+    edit:boolean
 }
 interface HanleChangeInterface{
     (event:React.ChangeEvent<HTMLInputElement>): void;
-}
-interface HandleSubmit{
-    ():void
 }
 interface HandleTodoClick {
     (item :TodoInterface, index:number): void;
@@ -23,25 +18,29 @@ interface HandleTodoClick {
 export const Form:React.FC = () =>{
     const [todo,setTodo] = useState<TodoInterface>({
         name:"",
-        completed: false
+        completed: false,
+        edit: false
     });
     const [todoList,setTodoList] = useState<Array<TodoInterface>>([]);
 
     const handleInput:HanleChangeInterface = (event) =>{
-        setTodo({name:event.currentTarget.value,completed:false})
+        setTodo({name:event.currentTarget.value,completed:false,edit:false})
         
     }
-
     const handleButtonSubmit = () =>{
-         setTodoList([...todoList,todo])
-         setTodo({name:"",completed:false})
-         console.log(todoList)
+            setTodoList([...todoList,todo])
+            setTodo({name:"",completed:false,edit:false})
+            console.log(todoList)
     }
     const handleTodoItem:HandleTodoClick = (item,index) =>{
-        console.log(item,index)
-
         let updatedTodoList = [...todoList];
-        updatedTodoList[index] = {name:item.name,completed:!item.completed}
+        updatedTodoList[index] = {name:item.name,completed:!item.completed,edit:false}
+        setTodoList(updatedTodoList)
+    }
+    const handleTodoDoubleClick:HandleTodoClick = (item,index) =>{
+        console.log("ITEM",item)
+        let updatedTodoList = [...todoList];
+        updatedTodoList[index] = {name:item.name,completed:!item.completed,edit:false}
         setTodoList(updatedTodoList)
     }
     
@@ -60,7 +59,12 @@ export const Form:React.FC = () =>{
             {todoList.length? <div>
                 {todoList.map((item,index)=>{
                     return(
-                        <p key={index} style={item.completed? {color:"red"}:{color:"black"}}onClick={()=>handleTodoItem(item,index)}>{item.name}</p>
+                        <p key={index} 
+                            style={item.completed? 
+                            {color:"red"}:{color:"black"}}
+                            onClick={()=>handleTodoItem(item,index)}
+                            onDoubleClick={()=>handleTodoDoubleClick(item,index)}
+                        >{item.name}</p>
                     )
                 })}
             </div>: null}
