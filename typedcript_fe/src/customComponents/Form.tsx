@@ -6,41 +6,44 @@ import {useState,useReducer} from "react"
 interface TodoInterface{
     name: string;
     completed: boolean;
-}
-interface TodoListInterface{
-    [index:string]: TodoInterface
+    edit:boolean
 }
 interface HanleChangeInterface{
     (event:React.ChangeEvent<HTMLInputElement>): void;
 }
-interface HandleSubmit{
-    ():void
-}
 interface HandleTodoClick {
-    (item :string): void;
+    (item :TodoInterface, index:number): void;
 }
 //----------------------------------------------------------------------
 export const Form:React.FC = () =>{
     const [todo,setTodo] = useState<TodoInterface>({
         name:"",
-        completed: false
+        completed: false,
+        edit: false
     });
-    const [todoList,setTodoList] = useState<TodoListInterface[]>([]);
+    const [todoList,setTodoList] = useState<Array<TodoInterface>>([]);
 
     const handleInput:HanleChangeInterface = (event) =>{
-        console.log(event.currentTarget.value)
-        setTodo({name:event.currentTarget.value,completed:false})
+        setTodo({name:event.currentTarget.value,completed:false,edit:false})
         
     }
-
-    const handleButtonSubmit:HandleSubmit = () =>{
-       // setTodoList([...todoList,todo])
-         setTodo({name:"",completed:false})
+    const handleButtonSubmit = () =>{
+            setTodoList([...todoList,todo])
+            setTodo({name:"",completed:false,edit:false})
+            console.log(todoList)
     }
-    const handleTodoItem:HandleTodoClick = (item) =>{
-        console.log(item)
+    const handleTodoItem:HandleTodoClick = (item,index) =>{
+        let updatedTodoList = [...todoList];
+        updatedTodoList[index] = {name:item.name,completed:!item.completed,edit:false}
+        setTodoList(updatedTodoList)
     }
-
+    const handleTodoDoubleClick:HandleTodoClick = (item,index) =>{
+        console.log("ITEM",item)
+        let updatedTodoList = [...todoList];
+        updatedTodoList[index] = {name:item.name,completed:!item.completed,edit:false}
+        setTodoList(updatedTodoList)
+    }
+    
     return(
         <div>
             <input
@@ -56,7 +59,12 @@ export const Form:React.FC = () =>{
             {todoList.length? <div>
                 {todoList.map((item,index)=>{
                     return(
-                        <p key={index}>{item}</p>
+                        <p key={index} 
+                            style={item.completed? 
+                            {color:"red"}:{color:"black"}}
+                            onClick={()=>handleTodoItem(item,index)}
+                            onDoubleClick={()=>handleTodoDoubleClick(item,index)}
+                        >{item.name}</p>
                     )
                 })}
             </div>: null}
