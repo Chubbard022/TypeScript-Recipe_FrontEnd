@@ -1,5 +1,6 @@
 import * as React from "react";
 import {useState,useReducer} from "react"
+import { Children } from "react";
 //----------------------------------------------------------------------
 //                          INTERFACE
 //----------------------------------------------------------------------
@@ -14,12 +15,20 @@ interface HanleChangeInterface{
 interface HandleTodoClick {
     (item :TodoInterface, index:number): void;
 }
+interface FromProps {  
+    test: string,
+        // best: boolean,
+        // another: number[],
+        // obj: {
+        //     test: string
+        // }
+}
 //----------------------------------------------------------------------
-export const Form:React.FC = () =>{
+export const Form:React.FC<FromProps> = (props) =>{
     const [todo,setTodo] = useState<TodoInterface>({
         name:"",
         completed: false,
-        edit: false
+        edit: false,
     });
     const [todoList,setTodoList] = useState<Array<TodoInterface>>([]);
 
@@ -43,7 +52,7 @@ export const Form:React.FC = () =>{
         updatedTodoList[index] = {name:item.name,completed:!item.completed,edit:false}
         setTodoList(updatedTodoList)
     }
-    
+    console.log("PROPS",props)
     return(
         <div>
             <input
